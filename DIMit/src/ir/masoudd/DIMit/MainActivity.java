@@ -24,7 +24,8 @@ public class MainActivity extends ActionBarActivity {
 		@Override
 		public void onProgressChanged(SeekBar seekBar, int progress,
 				boolean fromUser) {
-			Log.d("masoud", String.format("alphaPercent changed to %d", progress));
+			Log.d("masoud",
+					String.format("alphaPercent changed to %d", progress));
 			alphaPercent = progress;
 			if (started) {
 				// update the alpha of the DimService with a new intent
@@ -80,7 +81,8 @@ public class MainActivity extends ActionBarActivity {
 
 		Log.d("masoud", "onStart");
 
-		alphaPercent = getSharedPreferences("settings", MODE_PRIVATE).getInt("alphaPercent", 20);
+		alphaPercent = getSharedPreferences("settings", MODE_PRIVATE).getInt(
+				"alphaPercent", 20);
 		alphaSeekBar.setProgress(alphaPercent);
 
 	}
@@ -90,26 +92,11 @@ public class MainActivity extends ActionBarActivity {
 		super.onStop();
 
 		Log.d("masoud", "onStop");
-		
+
 		Editor editor = getSharedPreferences("settings", MODE_PRIVATE).edit();
 		editor.putInt("alphaPercent", alphaSeekBar.getProgress());
 		editor.commit();
 
-	}
-
-	@Override
-	protected void onRestoreInstanceState(Bundle savedInstanceState) {
-		super.onRestoreInstanceState(savedInstanceState);
-
-		Log.d("masoud", "onRestoreInstanceState");
-		alphaSeekBar.setProgress(savedInstanceState.getInt("alphaPercent"));
-	}
-
-	@Override
-	protected void onSaveInstanceState(Bundle outState) {
-		Log.d("masoud", "onSaveInstanceState");
-		super.onSaveInstanceState(outState);
-		outState.putInt("alphaPercent", alphaSeekBar.getProgress());
 	}
 
 	@Override

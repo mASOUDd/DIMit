@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.PixelFormat;
 import android.os.Binder;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
@@ -14,7 +15,8 @@ import android.view.WindowManager;
 public class DimService extends Service {
 
 	private final IBinder myBinder = new LocalBinder();
-	myViewGroup myView;
+	// This is the semi transparent layer
+	myViewGroup myView;  
 
 	// TODO: add color seekBars too.
 	private int alpha = 200;
@@ -55,6 +57,8 @@ public class DimService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		
+		Log.d("debug_service", "onCreate");
 
 		myView = null;
 
@@ -62,6 +66,12 @@ public class DimService extends Service {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
+		//TODO: I'm not sure if the super constructor needs to be called here
+		super.onStartCommand(intent, flags, startId);
+		
+		Log.d("debug_service", "onStartCommand");
+//		startDIM();
+		
 		// We want this service to continue running until it is explicitly
 		// stopped, so return sticky.
 		return START_STICKY;
@@ -70,10 +80,13 @@ public class DimService extends Service {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
+		
+		Log.d("debug_service", "onDestroy");
 		stopDIM();
 
 	}
 
+	// we have to invalidate the ViewGroup so that its onDraw gets called again.
 	private void updateView() {
 		if (myView != null) {
 			myView.invalidate();
@@ -83,6 +96,7 @@ public class DimService extends Service {
 	/* public methods for the client to call from this service */
 
 	public void startDIM() {
+		Log.d("debug_service", "startDIM");
 		if (myView == null) {
 			myView = new myViewGroup(this);
 			WindowManager.LayoutParams params = new WindowManager.LayoutParams(
@@ -99,6 +113,7 @@ public class DimService extends Service {
 	}
 
 	public void stopDIM() {
+		Log.d("debug_service", "stopDIM");
 		if (myView != null) {
 			((WindowManager) getSystemService(WINDOW_SERVICE))
 					.removeView(myView);
@@ -107,6 +122,7 @@ public class DimService extends Service {
 	}
 
 	public void setAlpha(int alpha) {
+		Log.d("debug_service", "setAlpha");
 
 		// Nobody wants to change the alpha linearly.
 

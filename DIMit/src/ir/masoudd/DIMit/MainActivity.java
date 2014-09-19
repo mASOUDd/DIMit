@@ -96,6 +96,7 @@ public class MainActivity extends ActionBarActivity {
 		Log.d("masoud", "onStart");
 		// bind to DimService
 		Intent intent = new Intent(this, DimService.class);
+		Log.d("debug_service", "MainActivity: binding to DimService");
 		bindService(intent, myConn, BIND_AUTO_CREATE);
 
 		int progress = getPreferences(MODE_PRIVATE).getInt("alpha", 20);
@@ -111,6 +112,8 @@ public class MainActivity extends ActionBarActivity {
 		Editor editor = getPreferences(MODE_PRIVATE).edit();
 		editor.putInt("alpha", alphaSeekBar.getProgress());
 		editor.commit();
+		
+		Log.d("debug_service", "MainActivity: unbinding from DimService");
 		unbindService(myConn);
 	}
 

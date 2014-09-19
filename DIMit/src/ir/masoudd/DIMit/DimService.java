@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.PixelFormat;
-import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.ViewGroup;
@@ -14,21 +13,14 @@ import android.view.WindowManager;
 
 public class DimService extends Service {
 
-	private final IBinder myBinder = new LocalBinder();
 	// This is the semi transparent layer
-	myViewGroup myView;  
+	myViewGroup myView;
 
 	// TODO: add color seekBars too.
-	private int alpha = 200;
+	private int alpha = 20;
 	private int red = 0;
 	private int green = 0;
 	private int blue = 0;
-
-	class LocalBinder extends Binder {
-		DimService getService() {
-			return DimService.this;
-		}
-	}
 
 	class myViewGroup extends ViewGroup {
 
@@ -51,13 +43,13 @@ public class DimService extends Service {
 
 	@Override
 	public IBinder onBind(Intent intent) {
-		return myBinder;
+		return null;
 	}
 
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		
+
 		Log.d("debug_service", "onCreate");
 
 		myView = null;
@@ -66,12 +58,28 @@ public class DimService extends Service {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		//TODO: I'm not sure if the super constructor needs to be called here
+		// TODO: I'm not sure if the super constructor needs to be called here
 		super.onStartCommand(intent, flags, startId);
-		
+
 		Log.d("debug_service", "onStartCommand");
-//		startDIM();
-		
+		int alphaPercent;
+		if (intent != null) {
+			alphaPercent = intent.getIntExtra("alphaPercent", 20);
+			Log.d("debug_service", String.format(
+					"onStartCommand: got alphaPercent = %d from intent", alphaPercent));
+
+		} else {
+			// we are probably being restarted by system because of being sticky
+			// check the saved preference of MainActivity for alpha
+			alphaPercent = getSharedPreferences("settings", MODE_PRIVATE).getInt(
+					"alphaPercent", 20);
+			Log.d("debug_service", String.format(
+					"onStartCommand: got alphaPercent = %d from sharedPreferences", alphaPercent));
+
+		}
+		setAlpha(alphaPercent);
+		startDIM();
+
 		// We want this service to continue running until it is explicitly
 		// stopped, so return sticky.
 		return START_STICKY;
@@ -80,7 +88,7 @@ public class DimService extends Service {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		
+
 		Log.d("debug_service", "onDestroy");
 		stopDIM();
 
@@ -93,15 +101,14 @@ public class DimService extends Service {
 		}
 	}
 
-	/* public methods for the client to call from this service */
+
 
 	public void startDIM() {
 		Log.d("debug_service", "startDIM");
 		if (myView == null) {
 			myView = new myViewGroup(this);
 			WindowManager.LayoutParams params = new WindowManager.LayoutParams(
-					LayoutParams.MATCH_PARENT,
-					LayoutParams.MATCH_PARENT,
+					LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT,
 					WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY,
 					WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
 							| WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,

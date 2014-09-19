@@ -1,12 +1,8 @@
 package ir.masoudd.DIMit;
 
-import ir.masoudd.DIMit.DimService.LocalBinder;
-import android.content.ComponentName;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -19,16 +15,21 @@ import android.widget.Toast;
 
 public class MainActivity extends ActionBarActivity {
 
-	private DimService myService;
-	private ServiceConnection myConn;
 	private SeekBar alphaSeekBar;
+	private volatile int alphaPercent = 0;
+	private boolean started = false;
 
 	class mySeekBarListener implements OnSeekBarChangeListener {
 
 		@Override
 		public void onProgressChanged(SeekBar seekBar, int progress,
 				boolean fromUser) {
-			myService.setAlpha(progress);
+			Log.d("masoud", String.format("alphaPercent changed to %d", progress));
+			alphaPercent = progress;
+			if (started) {
+				// update the alpha of the DimService with a new intent
+				startDimService(null);
+			}
 
 		}
 
@@ -42,17 +43,18 @@ public class MainActivity extends ActionBarActivity {
 
 	}
 
-	public void startService(View view) {
+	public void startDimService(View view) {
+		started = true;
 
 		Intent intent = new Intent(this, DimService.class);
+		intent.putExtra("alphaPercent", alphaPercent);
 		startService(intent);
-		myService.startDIM();
 
 	}
 
-	public void stopService(View view) {
+	public void stopDimService(View view) {
 
-		myService.stopDIM();
+		started = false;
 		Intent intent = new Intent(this, DimService.class);
 		stopService(intent);
 	}
@@ -68,24 +70,7 @@ public class MainActivity extends ActionBarActivity {
 		Log.d("masoud", "onCreate");
 
 		alphaSeekBar = (SeekBar) findViewById(R.id.skbar_alpha);
-		myConn = new ServiceConnection() {
-
-			@Override
-			public void onServiceDisconnected(ComponentName name) {
-
-			}
-
-			@Override
-			public void onServiceConnected(ComponentName name, IBinder service) {
-				LocalBinder binder = (LocalBinder) service;
-				myService = binder.getService();
-				alphaSeekBar
-						.setOnSeekBarChangeListener(new mySeekBarListener());
-				myService.setAlpha(alphaSeekBar.getProgress());
-			}
-		};
-
-		SeekBar alphaSeekBar = (SeekBar) findViewById(R.id.skbar_alpha);
+		alphaSeekBar.setOnSeekBarChangeListener(new mySeekBarListener());
 
 	}
 
@@ -94,13 +79,9 @@ public class MainActivity extends ActionBarActivity {
 		super.onStart();
 
 		Log.d("masoud", "onStart");
-		// bind to DimService
-		Intent intent = new Intent(this, DimService.class);
-		Log.d("debug_service", "MainActivity: binding to DimService");
-		bindService(intent, myConn, BIND_AUTO_CREATE);
 
-		int progress = getPreferences(MODE_PRIVATE).getInt("alpha", 20);
-		alphaSeekBar.setProgress(progress);
+		alphaPercent = getSharedPreferences("settings", MODE_PRIVATE).getInt("alphaPercent", 20);
+		alphaSeekBar.setProgress(alphaPercent);
 
 	}
 
@@ -109,12 +90,11 @@ public class MainActivity extends ActionBarActivity {
 		super.onStop();
 
 		Log.d("masoud", "onStop");
-		Editor editor = getPreferences(MODE_PRIVATE).edit();
-		editor.putInt("alpha", alphaSeekBar.getProgress());
-		editor.commit();
 		
-		Log.d("debug_service", "MainActivity: unbinding from DimService");
-		unbindService(myConn);
+		Editor editor = getSharedPreferences("settings", MODE_PRIVATE).edit();
+		editor.putInt("alphaPercent", alphaSeekBar.getProgress());
+		editor.commit();
+
 	}
 
 	@Override
@@ -122,14 +102,14 @@ public class MainActivity extends ActionBarActivity {
 		super.onRestoreInstanceState(savedInstanceState);
 
 		Log.d("masoud", "onRestoreInstanceState");
-		alphaSeekBar.setProgress(savedInstanceState.getInt("alpha"));
+		alphaSeekBar.setProgress(savedInstanceState.getInt("alphaPercent"));
 	}
 
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		Log.d("masoud", "onSaveInstanceState");
 		super.onSaveInstanceState(outState);
-		outState.putInt("alpha", alphaSeekBar.getProgress());
+		outState.putInt("alphaPercent", alphaSeekBar.getProgress());
 	}
 
 	@Override
@@ -139,18 +119,18 @@ public class MainActivity extends ActionBarActivity {
 		return true;
 
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		switch(item.getItemId()) {
+		switch (item.getItemId()) {
 		case R.id.about_menu:
 			Intent intent = new Intent(this, AboutActivity.class);
 			startActivity(intent);
 			return true;
-			
+
 		default:
 			return false;
 		}
-			
+
 	}
 }

@@ -10,13 +10,13 @@
         android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
         
-        android:onClick="startService"
+        android:onClick="startDimService"
         android:text="@string/startservice" />
 
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="stopService"
+        android:onClick="stopDimService"
         android:text="@string/stopservice" />
 
     <TextView

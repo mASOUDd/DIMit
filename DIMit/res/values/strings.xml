@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">DIMit</string>
+    <string name="startservice">Start</string>
+    <string name="stopservice">Stop</string>
+    <string name="alphalabel">Alpha:</string>
+    <string name="abouttitle">About</string>
+    <string name="title_activity_about">About</string>
+    <string name="license">Copyright© 2014 Masoud Naservand relive.mn@gmail.com
+        https://github.com/mASOUDd/DIMit</string>
+    <string name="iconlicense">Icon made by <a href="http://www.freepik.com">Freepik</a> from www.flaticon.com is licensed under <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0">CC BY 3.0</a></string>
+   
+    <string name="gpl">This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.<br/>
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with this program.  If not, see <a>http://www.gnu.org/licenses</a>.</string>
+
+</resources>

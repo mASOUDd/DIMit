@@ -1,6 +1,7 @@
 package ir.masoudd.DIMit;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -81,9 +82,11 @@ public class MainActivity extends ActionBarActivity {
 
 		Log.d("masoud", "onStart");
 
-		alphaPercent = getSharedPreferences("settings", MODE_PRIVATE).getInt(
-				"alphaPercent", 20);
+		SharedPreferences pref = getSharedPreferences("settings", MODE_PRIVATE);
+		alphaPercent = pref.getInt("alphaPercent", 20);
 		alphaSeekBar.setProgress(alphaPercent);
+		
+		started = pref.getBoolean("started", false);
 
 	}
 
@@ -95,6 +98,7 @@ public class MainActivity extends ActionBarActivity {
 
 		Editor editor = getSharedPreferences("settings", MODE_PRIVATE).edit();
 		editor.putInt("alphaPercent", alphaSeekBar.getProgress());
+		editor.putBoolean("started", started);
 		editor.commit();
 
 	}
